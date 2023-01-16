@@ -1,0 +1,151 @@
+https://jhooq.com/categories/helm-chart/
+https://jhooq.com/helm-multiple-values-files/
+
+https://blog.devgenius.io/helm-helm-basics-a366daec5a81
+
+Let’s see what happens when the Helm chart is installed into Kubernetes.
+Helm reads the chart
+It reads the configuration values from the Values.yml and generates the manifest files with these values.
+Helm sends these generated manifests to the Kubernetes API server
+Kubernetes takes these manifest files and creates desired resources in the cluster.
+Helm allows focusing on the most important values
+
+Chart: Represents a Helm package. It contains all the resource definition files in YAML format needed to run an application, tool or service.
+Repository: It is a place to store and share Helm Charts, similar to Github repository where source code is stored, and Docker repository where images are stored.
+Release: It is an instance of Chart running in K8s. A Chart can usually be installed multiple times in the same K8s cluster. Every installation creates a new Release.
+
+
+
+
+helm search hub wordpress
+helm search hub wordpress  --max-col-width=0
+go to web link and add repo
+helm repo add bitnami https://charts.bitnami.com/bitnami
+helm repo list
+helm search repo wordpress --versions
+helm show readme bitnami/wordpress --version 10.0.3
+helm install testchart stable/tomcat --version 0.4.0
+helm show <values|chart|readme|all chartname
+helm get <all|manifest|valuse release
+helm install --dry-run testchart stable/wordpress
+helm install testchart stable/tomact --set service.typ=Nodeport
+helm show values stable/tomcat
+helm pull chartname
+helm pull --untar chartname
+helm install testchart urlofchartname
+
+========================================
+
+
+wordpress/
+  Chart.yaml          # A YAML file containing information about the chart
+  LICENSE             # OPTIONAL: A plain text file containing the license for the chart
+  README.md           # OPTIONAL: A human-readable README file
+  requirements.yaml   # OPTIONAL: A YAML file listing dependencies for the chart
+  values.yaml         # The default configuration values for this chart
+  charts/             # A directory containing any charts upon which this chart depends.
+  templates/          # A directory of templates that, when combined with values,
+                      # will generate valid Kubernetes manifest files.
+  templates/NOTES.txt # OPTIONAL: A plain text file containing short usage notes
+  
+  Writing helmcharts:
+  
+  https://devopslearning.medium.com/introduction-to-helm-and-creating-your-first-helm-chart-53c5df736bf2 (good refernce follow it)
+  https://docs.bitnami.com/tutorials/create-your-first-helm-chart/
+  https://medium.com/swlh/helm-chart-development-guide-bbc525d3b448
+  https://ankush-chavan.medium.com/complete-guide-for-creating-and-deploying-helm-chart-423ba8e1f0e6
+
+==========================================================================================
+
+templates
+
+Templates is one of the most important directory and this is where helm looks for your kubernetes object yaml definitions(Deployment,Services,etc).
+
+values.yaml
+
+If templates holds the resource definition, then values provides the way to parameterize it.
+
+_helpers.tpl
+
+Helm allows the use of Go templating in the resources files for kubernetes. The _helpers.tpl is used to define Go template helpers.
+
+NOTES.txt
+
+This is the plain text file that get printed out when the chart is successfully deployed. Usually this contains the next step for using the chart.
+
+Chart.yaml
+
+This file contain the metadata such as chart version, application version or constraints like minimum version of kubernetes/Helm which is required to manage this chart. Some required fields in Chart.yaml
+  
+  
+  ===========================================================
+
+https://lzone.de/cheat-sheet/Linux-Networking
+=========================
+helm install releasename(it can be anything) chartname
+helm install --dry-run --debug
+helm install --dry-run testchart stable/wordpress
+helm install testchart stable/wordpress --wait --timeout 10s
+helm show <values|chart|readme|all chartname
+helm show values bitnami/wordpress --version 10.0.3
+helm show chart bitnami/wordpress
+
+first give helm show know which values to pass and pass it to chart
+helm show values stable/tomcat
+helm install testchart stable/tomact --set service.typ=Nodeport
+
+
+for username  and passwd related values helm show values bitnami/wordpress --version 10.0.3
+vi wordpress-values.yaml
+Next insert all the values like username,password,servicetype,email 
+helm install wordpress bitnami/wordpress --values=wordpress-values.yaml --namespace nswordpress --version 10.0.3
+
+after installation
+helm get manifest testchart2
+helm get <all|manifest|valuse release
+helm get all testchart
+helm status releasename
+
+===========================================================================================================
+
+helm pull chartname
+helm pull --untar chartname
+helm install testchart urlofchartname
+
+==================
+Env variable using helm
+Helm chart provides a couple of ways to access or pass environment variables into the templates
+
+set
+values.yaml
+
+helm install --set replicaCount=2 helloworld-1 world
+
+1. Set multiple values and Overriding
+helm install --set replicaCount=2  --set replicaCount=3 helloworldrelease helloworld
+
+helm install -f myvalues.yaml helloworldrelease helloworld 
+
+2.2 Iterate over key-value map
+
+create vi env-values.yaml
+examplemap:
+ - name: "USERNAME"
+   value: "test1"
+ - name: "PASSWORD"
+   value: "test2" 
+
+
+
+helm template :- It will do the validation and generate the YAML manifest but it can not guarantee that generated kubernetes resource(YAMLs) is valid or not.
+helm templete chartname
+
+
+helm get --help
+
+ helm search hub consul | grep hashicorp
+ 
+ helm install amaze-surf bitnami/apache
+
+helm uninstall <release-name>
+helm repo remove hashicorp
